@@ -1,0 +1,51 @@
+﻿mysql
+
+yum -y install gcc make cmake ncurses-devel libxml2-devel libtool-ltdl-devel gcc-c++ autoconf automake bison zlib-devel
+
+groupadd mysql
+
+useradd mysql -M -g mysql
+
+tar zxvf mysql-5.6.11.tar.gz -C /opt/mysql/
+
+cmake . -DENABLE_DOWNLOADS=1
+
+make && make install
+
+chown -R mysql:mysql /usr/local/mysql
+
+/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/home/mysql --datadir=/home/mysql/data
+
+cp /usr/local/mysql/my.cnf /etc/  
+
+/usr/local/mysql/bin/mysqld_safe --user=mysql &  或者  /usr/local/mysql/bin/mysql
+
+cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+
+chkconfig --add mysqld
+chkconfig mysqld on
+
+vi /etc/profile.d/mysql.sh
+cat /etc/profile.d/mysql.sh
+export PATH=$PATH:/usr/local/mysql/bin
+
+这个命令看mysql默认创建的user账号及密码
+[root@test2 scripts]# history|grep -i select
+   58  mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
+   99  mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
+  135  history|grep -i select
+[root@test2 scripts]# !58
+mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
++------+-----------+----------+
+| User | Host      | Password |
++------+-----------+----------+
+| root | localhost |          |
+| root | test2     |          |
+| root | 127.0.0.1 |          |
+| root | ::1       |          |
+|      | localhost |          |
+|      | test2     |          |
++------+-----------+----------+
+
+初始化设置
+/usr/local/mysql/bin/mysql_secure_installation 
