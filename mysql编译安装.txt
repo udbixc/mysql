@@ -1,35 +1,43 @@
 ﻿mysql
 
+#解决依赖
 yum -y install gcc make cmake ncurses-devel libxml2-devel libtool-ltdl-devel gcc-c++ autoconf automake bison zlib-devel
 
+#创建用户，添加主，组
 groupadd mysql
-
 useradd mysql -M -g mysql
 
+#解压
 tar zxvf mysql-5.6.11.tar.gz -C /opt/mysql/
 
+#编译安装
 cmake . -DENABLE_DOWNLOADS=1
-
 make && make install
 
+#为安装目录添加属主，组
 chown -R mysql:mysql /usr/local/mysql
 
+#初始化，5.6用mysql_install_db，安装目录和数据存放目录，属主
 /usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/home/mysql --datadir=/home/mysql/data
 
+#复制配置文件/etc/my.cnf
 cp /usr/local/mysql/my.cnf /etc/  
 
-/usr/local/mysql/bin/mysqld_safe --user=mysql &  或者  /usr/local/mysql/bin/mysql
+#启动数据库的方法
+1，# 	/usr/local/mysql/bin/mysqld_safe --user=mysql &  
+2，#    /usr/local/mysql/bin/mysql
+3，#	cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld  && systemctl start mysql
 
-cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
-
+#创建开机自启，centos7不是这样子的
 chkconfig --add mysqld
 chkconfig mysqld on
 
+#将数据库环境添加到系统环境中
 vi /etc/profile.d/mysql.sh
 cat /etc/profile.d/mysql.sh
 export PATH=$PATH:/usr/local/mysql/bin
 
-这个命令看mysql默认创建的user账号及密码
+#这个命令看mysql默认创建的user账号及密码
 [root@test2 scripts]# history|grep -i select
    58  mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
    99  mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
@@ -47,5 +55,5 @@ mysql -u root -e "SELECT User,Host,Password FROM mysql.user"
 |      | test2     |          |
 +------+-----------+----------+
 
-初始化设置
+#初始化设置
 /usr/local/mysql/bin/mysql_secure_installation 
